@@ -27,7 +27,14 @@ class StyledElement {
   });
 
   bool matchesSelector(String selector) {
-    return (element != null && matches(element!, selector)) || name == selector;
+    if (element case final element?) {
+      try {
+        if (matches(element, selector)) {
+          return true;
+        }
+      } catch (_) {}
+    }
+    return name == selector;
   }
 
   Map<String, String> get attributes => node.attributes.map((key, value) {
