@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:csslib/parser.dart';
 import 'package:flutter_html/src/style.dart';
 import 'package:html/dom.dart' as dom;
 //TODO(Sub6Resources): don't use the internal code of the html package as it may change unexpectedly.
@@ -28,7 +29,12 @@ class StyledElement {
 
   bool matches(dom.Element element, String selector) {
     try {
-      return qs.matches(element, selector);
+      final errors = <Message>[];
+      final group = parseSelectorGroup(selector, errors: errors);
+      if (group == null || errors.isNotEmpty) {
+        throw FormatException("'$selector' is not a valid selector: $errors");
+      }
+      return qs.SelectorEvaluator().matches(element, group);
     } catch (_) {
       return false;
     }
